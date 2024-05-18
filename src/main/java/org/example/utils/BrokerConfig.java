@@ -8,4 +8,8 @@ public class BrokerConfig {
     public Object getPassword() {
         return null;
     }
+
+    public String getSchema() {
+        return null;
+    }
 }
