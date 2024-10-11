@@ -1,0 +1,8 @@
+spring.artemis.mode: native
+spring.artemis.host: 127.0.0.1
+spring.artemis.port: 60616
+spring.artemis.user: artemis
+spring.artemis.password: artemis
+
+jms.queue.Example.read: TEST.REQ
+jms.queue.Example.write: TEST.RESP
