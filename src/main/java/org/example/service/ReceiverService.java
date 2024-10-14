@@ -21,11 +21,11 @@ public class ReceiverService {
     @Autowired
     LoggingService loggingService;
 
-    @Value("${jms.queue.Example.write}")
+    @Value("${jms.queue.write}")
     String respQueue;
 
     @Async
-    @JmsListener(destination = "${jms.queue.Example.read}")
+    @JmsListener(destination = "${jms.queue.read}")
     public void listenMessage(Message message) throws JMSException, InterruptedException, IOException {
 
         String correlationId = message.getJMSCorrelationID();
