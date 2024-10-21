@@ -24,9 +24,12 @@ public class ReceiverService {
     @Value("${jms.queue.write}")
     String respQueue;
 
+    @Value("${template.name}")
+    String templateName;
+
     @Async
     @JmsListener(destination = "${jms.queue.read}")
-    public void listenMessage(Message message) throws JMSException, InterruptedException, IOException {
+    public void listenMessage(Message message) throws JMSException, InterruptedException {
 
         String correlationId = message.getJMSCorrelationID();
 
@@ -36,11 +39,21 @@ public class ReceiverService {
 
         Thread.sleep(1000);
 
-        String respBody = IOUtils.toString(ReceiverService.class.getResource("/templates/testTemplate.xml"), StandardCharsets.UTF_8);
+        String respBody = getStringFromTemplate(templateName);
 
         dispatcherService.sendMessage(respBody, correlationId, respQueue);
 
         loggingService.log("Отправили сообщение с corrId " + correlationId);
         loggingService.log("\n" + respBody);
     }
+
+    private String getStringFromTemplate(String template) {
+        try {
+            return IOUtils.toString(ReceiverService.class.getResource("/templates/" + template), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось получить строку из XML шаблона");
+        }
+    }
+
+
 }

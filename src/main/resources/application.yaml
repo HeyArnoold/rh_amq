@@ -1,8 +1,9 @@
 spring.artemis.mode: native
-spring.artemis.host: ${HOST:127.0.0.1}
-spring.artemis.port: ${PORT:60616}
+spring.artemis.host: ${HOST:localhost}
+spring.artemis.port: ${PORT:61616}
 spring.artemis.user: artemis
 spring.artemis.password: artemis
 
-jms.queue.read: TEST.REQ
-jms.queue.write: TEST.RESP
+jms.queue.read: ${QUEUE-READ:TEST.REQ}
+jms.queue.write: ${QUEUE-WRITE:TEST.RESP}
+template.name: ${TEMPLATE:testTemplate.xml}
