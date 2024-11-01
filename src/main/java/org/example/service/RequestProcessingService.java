@@ -1,6 +1,7 @@
 package org.example.service;
 
-import org.apache.commons.io.IOUtils;
+import lombok.extern.log4j.Log4j2;
+import org.example.xml.XmlProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
@@ -10,16 +11,16 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import static org.example.repository.TemplateRepository.getStringFromTemplate;
+
 
 @EnableAsync
 @Service
-public class ReceiverService {
+@Log4j2
+public class RequestProcessingService {
     @Autowired
     DispatcherService dispatcherService;
-    @Autowired
-    LoggingService loggingService;
 
     @Value("${jms.queue.write}")
     String respQueue;
@@ -34,26 +35,16 @@ public class ReceiverService {
         String correlationId = message.getJMSCorrelationID();
 
 
-        loggingService.log("Получили сообщение с corrId " + correlationId);
-        loggingService.log("\n" + message.getBody(String.class));
+        log.info("Получили сообщение с corrId {}", correlationId);
+        log.info("\n{}", message.getBody(String.class));
 
         Thread.sleep(1000);
 
-        String respBody = getStringFromTemplate(templateName);
+        String respBody = XmlProcessor.processXml(getStringFromTemplate(templateName));
 
         dispatcherService.sendMessage(respBody, correlationId, respQueue);
 
-        loggingService.log("Отправили сообщение с corrId " + correlationId);
-        loggingService.log("\n" + respBody);
+        log.info("Отправили сообщение с corrId {}", correlationId);
+        log.info("\n{}", respBody);
     }
-
-    private String getStringFromTemplate(String template) {
-        try {
-            return IOUtils.toString(ReceiverService.class.getResource("/templates/" + template), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Не удалось получить строку из XML шаблона");
-        }
-    }
-
-
 }
